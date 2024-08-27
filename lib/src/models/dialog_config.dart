@@ -13,6 +13,9 @@ class DialogConfig {
   /// Negative action text for the [AlertDialog]. Default to "Cancel"
   final String? negativeText;
 
+  // Builds content inside the dialog
+  final Widget? Function(String?)? contentBuilder;
+
   /// The default dialog theme, should it be iOS or other(including web and Android)
   final PinCodePlatform platform;
   DialogConfig._internal({
@@ -20,6 +23,7 @@ class DialogConfig {
     this.dialogTitle,
     this.affirmativeText,
     this.negativeText,
+    this.contentBuilder,
     this.platform = PinCodePlatform.other,
   });
 
@@ -28,6 +32,7 @@ class DialogConfig {
     String? dialogContent,
     String? dialogTitle,
     String? negativeText,
+    Widget? Function(String?)? contentBuilder,
     PinCodePlatform? platform,
   }) {
     return DialogConfig._internal(
@@ -35,6 +40,7 @@ class DialogConfig {
       dialogContent: dialogContent ?? "Do you want to paste this code ",
       dialogTitle: dialogTitle ?? "Paste Code",
       negativeText: negativeText ?? "Cancel",
+      contentBuilder: (p0) => SizedBox.shrink(),
       platform: platform ?? PinCodePlatform.other,
     );
   }

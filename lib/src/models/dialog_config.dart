@@ -40,7 +40,7 @@ class DialogConfig {
       dialogContent: dialogContent ?? "Do you want to paste this code ",
       dialogTitle: dialogTitle ?? "Paste Code",
       negativeText: negativeText ?? "Cancel",
-      contentBuilder: (p0) => SizedBox.shrink(),
+      contentBuilder: contentBuilder ?? (p0) => SizedBox.shrink(),
       platform: platform ?? PinCodePlatform.other,
     );
   }

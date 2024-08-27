@@ -312,15 +312,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
   late Animation<Offset> _offsetAnimation;
 
   late Animation<double> _cursorAnimation;
-  DialogConfig get _dialogConfig => widget.dialogConfig == null
-      ? DialogConfig()
-      : DialogConfig(
-          affirmativeText: widget.dialogConfig!.affirmativeText,
-          dialogContent: widget.dialogConfig!.dialogContent,
-          dialogTitle: widget.dialogConfig!.dialogTitle,
-          negativeText: widget.dialogConfig!.negativeText,
-          platform: widget.dialogConfig!.platform,
-        );
+  DialogConfig get _dialogConfig => widget.dialogConfig == null ? DialogConfig() : widget.dialogConfig!;
   PinTheme get _pinTheme => widget.pinTheme;
 
   Timer? _blinkDebounce;
@@ -417,6 +409,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
     assert(_dialogConfig.negativeText != null && _dialogConfig.negativeText!.isNotEmpty);
     assert(_dialogConfig.dialogTitle != null && _dialogConfig.dialogTitle!.isNotEmpty);
     assert(_dialogConfig.dialogContent != null && _dialogConfig.dialogContent!.isNotEmpty);
+    assert(_dialogConfig.contentBuilder != null);
   }
 
   runHapticFeedback() {

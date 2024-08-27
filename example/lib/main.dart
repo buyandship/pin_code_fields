@@ -37,8 +37,7 @@ class PinCodeVerificationScreen extends StatefulWidget {
   final String? phoneNumber;
 
   @override
-  State<PinCodeVerificationScreen> createState() =>
-      _PinCodeVerificationScreenState();
+  State<PinCodeVerificationScreen> createState() => _PinCodeVerificationScreenState();
 }
 
 class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
@@ -104,8 +103,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8),
                 child: RichText(
                   text: TextSpan(
                     text: "Enter the code sent to ",
@@ -237,8 +235,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                 height: 14,
               ),
               Container(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30),
+                margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30),
                 child: ButtonTheme(
                   height: 50,
                   child: TextButton(
@@ -246,8 +243,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                       formKey.currentState!.validate();
                       // conditions for validating
                       if (currentText.length != 6 || currentText != "123456") {
-                        errorController!.add(ErrorAnimationType
-                            .shake); // Triggering error shake animation
+                        errorController!.add(ErrorAnimationType.shake); // Triggering error shake animation
                         setState(() => hasError = true);
                       } else {
                         setState(
@@ -270,19 +266,7 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                     ),
                   ),
                 ),
-                decoration: BoxDecoration(
-                    color: Colors.green.shade300,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.green.shade200,
-                          offset: const Offset(1, -2),
-                          blurRadius: 5),
-                      BoxShadow(
-                          color: Colors.green.shade200,
-                          offset: const Offset(-1, 2),
-                          blurRadius: 5)
-                    ]),
+                decoration: BoxDecoration(color: Colors.green.shade300, borderRadius: BorderRadius.circular(5), boxShadow: [BoxShadow(color: Colors.green.shade200, offset: const Offset(1, -2), blurRadius: 5), BoxShadow(color: Colors.green.shade200, offset: const Offset(-1, 2), blurRadius: 5)]),
               ),
               const SizedBox(
                 height: 16,

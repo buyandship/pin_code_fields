@@ -14,7 +14,7 @@ class DialogConfig {
   final String? negativeText;
 
   // Builds content inside the dialog
-  final Widget? Function(String?)? contentBuilder;
+  final Widget? Function(String)? contentBuilder;
 
   /// The default dialog theme, should it be iOS or other(including web and Android)
   final PinCodePlatform platform;
@@ -32,7 +32,7 @@ class DialogConfig {
     String? dialogContent,
     String? dialogTitle,
     String? negativeText,
-    Widget? Function(String?)? contentBuilder,
+    Widget? Function(String)? contentBuilder,
     PinCodePlatform? platform,
   }) {
     return DialogConfig._internal(
@@ -40,7 +40,7 @@ class DialogConfig {
       dialogContent: dialogContent ?? "Do you want to paste this code ",
       dialogTitle: dialogTitle ?? "Paste Code",
       negativeText: negativeText ?? "Cancel",
-      contentBuilder: contentBuilder ?? (p0) => SizedBox.shrink(),
+      contentBuilder: contentBuilder ?? (p0) => Text('Do you want to paste $p0?'),
       platform: platform ?? PinCodePlatform.other,
     );
   }

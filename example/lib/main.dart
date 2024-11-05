@@ -179,9 +179,6 @@ class _PinCodeVerificationScreenState extends State<PinCodeVerificationScreen> {
                     onCompleted: (v) {
                       debugPrint("Completed");
                     },
-                    // onTap: () {
-                    //   print("Pressed");
-                    // },
                     onChanged: (value) {
                       debugPrint(value);
                       setState(() {

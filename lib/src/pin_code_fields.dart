@@ -666,53 +666,6 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
     );
   }
 
-  Future<void> _showPasteDialog(String pastedText) {
-    final formattedPastedText = pastedText.trim().substring(0, min(pastedText.trim().length, widget.length));
-
-    final defaultPastedTextStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).colorScheme.onSecondary,
-    );
-
-    return showDialog(
-      context: context,
-      useRootNavigator: true,
-      builder: (context) => _dialogConfig.platform == PinCodePlatform.iOS
-          ? CupertinoAlertDialog(
-              title: Text(_dialogConfig.dialogTitle!),
-              content: RichText(
-                text: TextSpan(
-                  text: _dialogConfig.dialogContent,
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.labelLarge!.color,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: formattedPastedText,
-                      style: widget.pastedTextStyle ?? defaultPastedTextStyle,
-                    ),
-                    TextSpan(
-                      text: "?",
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.labelLarge!.color,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              actions: _getActionButtons(formattedPastedText),
-            )
-          : AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: Text(_dialogConfig.dialogTitle!),
-              content: _dialogConfig.contentBuilder!(formattedPastedText),
-              actions: _getActionButtons(formattedPastedText),
-            ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     Directionality textField = Directionality(
@@ -720,14 +673,18 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
       child: Padding(
         padding: widget.errorTextMargin,
         child: TextFormField(
-          textInputAction: widget.textInputAction,
+          contextMenuBuilder: (context, editableTextState) {
+            print("Context menu triggered");
+            return AdaptiveTextSelectionToolbar.editableText(
+              editableTextState: editableTextState,
+            );
+          },
           controller: _textEditingController,
           focusNode: _focusNode,
           enabled: widget.enabled,
           autofillHints: widget.enablePinAutofill && widget.enabled ? <String>[AutofillHints.oneTimeCode] : null,
           autofocus: widget.autoFocus,
           autocorrect: false,
-          keyboardType: widget.keyboardType,
           keyboardAppearance: widget.keyboardAppearance,
           textCapitalization: widget.textCapitalization,
           validator: widget.validator,
@@ -735,17 +692,13 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
           autovalidateMode: widget.autovalidateMode,
           inputFormatters: [
             ...widget.inputFormatters,
-            LengthLimitingTextInputFormatter(
-              widget.length,
-            ), // this limits the input length
+            LengthLimitingTextInputFormatter(widget.length),
           ],
-          // trigger on the complete event handler from the keyboard
           onFieldSubmitted: widget.onSubmitted,
           onEditingComplete: widget.onEditingComplete,
-          enableInteractiveSelection: false,
-          showCursor: false,
-          // using same as background color so tha it can blend into the view
-          cursorWidth: 0.01,
+          enableInteractiveSelection: true, // Allow text selection
+          showCursor: true, // Enable cursor visibility
+          cursorWidth: 1, // Minimal cursor width to avoid visual issues
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(0),
             border: InputBorder.none,
@@ -757,13 +710,13 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
             focusedErrorBorder: InputBorder.none,
           ),
           style: TextStyle(
-            color: Colors.transparent,
-            height: .01,
-            fontSize: kIsWeb ? 1 : 0.01, // it is a hidden textfield which should remain transparent and extremely small
+            color: Colors.transparent, // This hides the text visually
+            height: 1.0, // Normal line height
+            fontSize: 0.01, // A very small font size but non-zero
           ),
           scrollPadding: widget.scrollPadding,
-          readOnly: widget.readOnly,
           obscureText: widget.obscureText,
+          readOnly: false, // Ensure the text field is editable and focusable
         ),
       ),
     );
@@ -774,51 +727,21 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
         // adding the extra space at the bottom to show the error text from validator
         height: (widget.autovalidateMode == AutovalidateMode.disabled && widget.validator == null) ? widget.pinTheme.fieldHeight : widget.pinTheme.fieldHeight + widget.errorTextSpace,
         color: widget.backgroundColor,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-            AbsorbPointer(
-              // this is a hidden textfield under the pin code fields.
-              absorbing: true, // it prevents on tap on the text field
-              child: widget.useExternalAutoFillGroup
-                  ? textField
-                  : AutofillGroup(
-                      onDisposeAction: widget.onAutoFillDisposeAction,
-                      child: textField,
-                    ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () {
-                  if (widget.onTap != null) widget.onTap!();
-                  _onFocus();
-                },
-                onLongPress: widget.enabled
-                    ? () async {
-                        var data = await Clipboard.getData("text/plain");
-                        if (data?.text?.isNotEmpty ?? false) {
-                          if (widget.beforeTextPaste != null) {
-                            if (widget.beforeTextPaste!(data!.text)) {
-                              widget.showPasteConfirmationDialog ? _showPasteDialog(data.text!) : _paste(data.text!);
-                            }
-                          } else {
-                            widget.showPasteConfirmationDialog ? _showPasteDialog(data!.text!) : _paste(data!.text!);
-                          }
-                        } else {
-                          _showPasteDialog(data!.text!);
-                        }
-                      }
-                    : null,
-                child: Row(
-                  mainAxisAlignment: widget.mainAxisAlignment,
-                  children: _generateFields(),
-                ),
+        child: GestureDetector(
+          onTap: () {
+            if (widget.onTap != null) widget.onTap!();
+            _onFocus();
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: widget.mainAxisAlignment,
+                children: _generateFields(),
               ),
-            ),
-          ],
+              textField,
+            ],
+          ),
         ),
       ),
     );
@@ -920,44 +843,6 @@ class _PinCodeTextFieldState extends State<PinCodeTextField> with TickerProvider
       _selectedIndex = data.length;
       _inputList = replaceInputList;
     });
-  }
-
-  List<Widget> _getActionButtons(String pastedText) {
-    var resultList = <Widget>[];
-    if (_dialogConfig.platform == PinCodePlatform.iOS) {
-      resultList.addAll([
-        CupertinoDialogAction(
-          child: Text(_dialogConfig.negativeText!),
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-        ),
-        CupertinoDialogAction(
-          child: Text(_dialogConfig.affirmativeText!),
-          onPressed: () {
-            _paste(pastedText);
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-        ),
-      ]);
-    } else {
-      resultList.addAll([
-        TextButton(
-          child: Text(_dialogConfig.negativeText!),
-          onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-        ),
-        TextButton(
-          child: Text(_dialogConfig.affirmativeText!),
-          onPressed: () {
-            _paste(pastedText);
-            Navigator.of(context, rootNavigator: true).pop();
-          },
-        ),
-      ]);
-    }
-    return resultList;
   }
 
   void _setState(void Function() function) {
